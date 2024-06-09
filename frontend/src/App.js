@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 //import './myMapStyles.css';
@@ -8,16 +8,40 @@ import 'mapbox-gl/dist/mapbox-gl.css'; //Map's css
 import RoomIcon from '@mui/icons-material/Room';
 import StarIcon from '@mui/icons-material/Star';
 
+import axios from 'axios';
 
+import {format} from 'timeago.js';
 
 function App() {
-    const [viewport, setViewport] = React.useState({
+    const [viewport, setViewport] = useState({
       
       latitude: 48.8584,
       longitude: 2.2945,
       zoom: 4
     });
+
+    const [pins, setPins] = useState([]);
+
+    const [currentPlaceId, setCurrentPlaceId] = useState(null);
   
+    useEffect(() => {
+      const getPins = async () => {
+        try{
+          const res = await axios.get("/pins");
+          setPins(res.data);
+        }catch(err){
+          console.log(err)
+        }
+      }
+      getPins()
+    },[]);
+
+    const handleMarkerClick = (id) => {
+      setCurrentPlaceId(id);
+    }
+
+    
+
     return (
     
     <div className='App'>
@@ -29,33 +53,43 @@ function App() {
           style={{ width: "100vw", height: "100vh" }}
           mapStyle="mapbox://styles/mapbox/streets-v9"
         >
-      
-          <Marker latitude={48.8584} longitude={2.2945} offsetLeft={-20} offsetTop={-10} anchor='center'>
 
-            <RoomIcon style={{ fontSize:viewport.zoom * 7, color: "slateblue"}}/>
+          {pins.map(p => (
+          <>  
+            <Marker latitude={p.lat} longitude={p.long} offsetLeft={-20} offsetTop={-10} anchor='center'>
 
-          </Marker>
+              <RoomIcon style={{ fontSize:viewport.zoom * 7, color: "slateblue", cursor:'pointer'}} 
+                onClick={() => handleMarkerClick(p._id)}
+              />
+
+            </Marker>
           
-          <Popup longitude={2.2945} latitude={48.8584} anchor="left">
-                <div className="card">
-                  <label>Place</label>
-                    <h4 className="place">Eiffel tower</h4>
-                  <label>Review</label>
-                    <p className="desc"> beatutyyy</p>
-                  <label>Rating</label>
-                  <div className="stars">
-                    <StarIcon className="star"></StarIcon>
-                    <StarIcon className="star"></StarIcon>
-                    <StarIcon className="star"></StarIcon>
-                    <StarIcon className="star"></StarIcon>
-                    <StarIcon className="star"></StarIcon>
-                  </div>
-                  <label>Information</label>
-                    <span className="username">Created by<b>anhs</b></span>
-                    <span className="date">1 hour ago</span>
-                </div>
-          </Popup>
-          
+            {p._id === currentPlaceId && (
+              <Popup longitude={p.long} latitude={p.lat} closeButton={true} closeOnClick={false} anchor="left" 
+                onClose={() => setCurrentPlaceId(null)}>
+                    <div className="card">
+                      <label>Place</label>
+                        <h4 className="place">{p.title}</h4>
+                      <label>Review</label>
+                        <p className="desc"> {p.desc}</p>
+                      <label>Rating</label>
+                      <div className="stars">
+                        <StarIcon className="star"></StarIcon>
+                        <StarIcon className="star"></StarIcon>
+                        <StarIcon className="star"></StarIcon>
+                        <StarIcon className="star"></StarIcon>
+                        <StarIcon className="star"></StarIcon>
+                      </div>
+                      <label>Information</label>
+                        <span className="username">Created by<b>{p.username}</b></span>
+                        <span className="date">{format(p.createdAt)}</span>
+                    </div>
+              </Popup>
+            )}
+
+          </>
+          ))}
+
         </Map>
 
     </div>
