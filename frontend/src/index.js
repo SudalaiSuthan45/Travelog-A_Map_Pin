@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
+// import './index.css'
+// index.js or App.js
+import 'mapbox-gl/dist/mapbox-gl.css';
 import App from './App';
 
 
