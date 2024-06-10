@@ -22,6 +22,8 @@ function App() {
       zoom: 3
     });
 
+    const myStorage = window.localStorage;
+
     const [pins, setPins] = useState([]);
 
     const [currentPlaceId, setCurrentPlaceId] = useState(null);
@@ -30,11 +32,11 @@ function App() {
     const [desc, setDesc] = useState(null);
     const [rating, setRating] = useState(0);
 
-    const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(myStorage.getItem("user"));
 
     const [showRegister, setShowRegister] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
-  
+
     useEffect(() => {
       const getPins = async () => {
         try{
@@ -53,13 +55,14 @@ function App() {
     };
 
     const handleAddClick = (e) => {
-      const [long, lat] = e.lngLat;
+      const {lat, lng} = e.lngLat;
       setNewPlace({
-        lat, 
-        long,        
+        lat,
+        long:lng,
       });
     };
 
+    
     const handleSubmit = async (e) => {
       e.preventDefault();
       const newPin = {
@@ -78,6 +81,11 @@ function App() {
       }catch(err){
         console.log(err)
       }
+    };
+
+    const handleLogout = () => {
+      myStorage.removeItem("user");
+      setCurrentUser(null);
     };
     
 
@@ -149,14 +157,14 @@ function App() {
                   </div>
               </Popup>
           )}
-          {currentUser ? (<button className='button logout'>Logout</button>) : (
+          {currentUser ? (<button className='button logout' onClick={handleLogout}>Logout</button>) : (
             <div className='buttons'>
               <button className='button login' onClick={() => setShowLogin(true)} >Login</button>
               <button className='button register' onClick={() => setShowRegister(true)} >Register</button>
             </div>
           )}
           {showRegister && <Register setShowRegister={setShowRegister} /> }
-          {showLogin && <Login setShowLogin={setShowLogin} />}
+          {showLogin && <Login setShowLogin={setShowLogin} myStorage={myStorage} setCurrentUser={setCurrentUser} />}
 
         </Map>
 
