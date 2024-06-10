@@ -1,0 +1,26 @@
+Mongodb
+MapBox
+
+cd backend
+
+    npm add express mongoose
+
+    npm add nodemon 
+
+    npm init 
+
+    npm add dotenv
+
+    npm add bcrypt
+
+cd frontend
+
+    npx create-react-app . 
+
+    npm add react-map-gl        or
+    npm install --save react-map-gl mapbox-gl @types/mapbox-gl 
+            //depends on version of react-map-gl web
+    
+    npm i axios
+
+    npm install timeago.js
